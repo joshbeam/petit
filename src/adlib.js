@@ -1,6 +1,6 @@
 /*
 
-AdLibJS v0.1.0
+AdLibJS
 An argument-based JavaScript framework
 
 The MIT License - (c) 2014, Joshua Beam
@@ -705,7 +705,7 @@ joshua.a.beam@gmail.com
 				node,
 				handler;
 			
-			if(len <= 2) {
+			if(len === 2) {
 				handler = arguments[1];
 				
 				forEach(this, function(el) {
@@ -725,9 +725,11 @@ joshua.a.beam@gmail.com
 
 					}
 				});					
-			} else if (len > 2) {
-				delegatedElement = _(arguments[1])[0].nodeName;
+			} else if (len === 3) {
+				delegatedElement = _(arguments[1]);
 				handler = arguments[2];
+				
+				console.log(delegatedElement);
 				
 				forEach(this, function(el) {
 					el.events['on'+eventType] = el.events['on'+eventType]||[];
@@ -735,9 +737,12 @@ joshua.a.beam@gmail.com
 						event = e || window.event;
 						target = event.target || event.srcElement;
 						
-						if(target && target.nodeName === delegatedElement) {
-							return handler(event);
-						}
+						forEach(delegatedElement,function(de,i) {
+//							if target and delegatedElement are a reference to the same object
+							if(target === de) {
+								return handler(event);
+							}
+						});
 					});
 
 	//				Update actual event handler
