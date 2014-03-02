@@ -11,9 +11,6 @@ joshua.a.beam@gmail.com
 
 //TODO: need .siblings()
 //TODO: throw TypeErrors?
-//TODO: potentially switch polyfills to just plain functions like I already have, or add them to AdLib (like extend)
-//		^^^ the above would be similar to jQuery browser-stable methods, like $.inArray, etc., which are accessible
-//		to the user.
 //TODO: add animation methods? or as add-ons?
 //TODO: add event delegation to event methods
 //TODO: look into using GRUNT for automation
@@ -21,9 +18,9 @@ joshua.a.beam@gmail.com
 //TODO: use observer pattern to link methods, setters, and states
 //TODO: switch args to arguments; variable creation might cost more
 //TODO: add _.each or _.forEach method
-//TODO: add options to name events to be able to detach specific handlers
+//TODO: add support to detach event handlers in event delegation
 
-;(function(win,doc) {
+;(function(win,doc,emptyArray) {
 	
 //	Array.prototype.indexOf polyfill for IE<9
 //	https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf#Polyfill
@@ -67,9 +64,7 @@ joshua.a.beam@gmail.com
 	styleAliases = {
 		'float': 'cssFloat' in styles ? 'cssFloat' : 'styleFloat',
 //		opacity ?
-	},
-	
-	emptyArray = [];
+	};
 	
 
 /*
@@ -277,21 +272,28 @@ joshua.a.beam@gmail.com
 		return emptyArray.slice.call(object,0);
 	}
 	
-	function addEvent(object, type, handler) {
-		if(doc.addEventListener) {
-			object.addEventListener(type, handler, false);
+	function handleEvent(how, object, type, handler) {
+		
+		if(doc[how+'EventListener']) {
+			
+			object[how+'EventListener'](type, handler, false);
+			
 		} else {
-			object.attachEvent('on'+type, handler);	
+			
+			var how = how === 'add' ? 'attach' : 'detach';
+			
+			object[how+'Event']('on'+type, handler);
+			
 		}
+		
 	}
 	
-	function removeEvent(object, type, handler) {
-		if(doc.removeEventListener) {
-			object.removeEventListener(type, handler, false);	
-		} else {
-			object.detachEvent('on'+type, handler);	
-		}
-	}
+//	function functionName(fun) {
+//	  var ret = fun.toString();
+//	  ret = ret.substr('function '.length);
+//	  ret = ret.substr(0, ret.indexOf('('));
+//	  return ret;
+//	}
 
 /*
 
@@ -374,16 +376,23 @@ joshua.a.beam@gmail.com
 //			Even if args[1] (context) is undefined, we can still pass it in (it just won't be used)
 			element = Zelekt(selector,args[1]);
 		} else if (len===3) {
-//			We're passing in --
-//				selector = HTMLString
-//				args[1] = appendTo|prependTo|before|after
-//				args[2] = location (DOMElement)
+			
+			/*
+				We're passing in --
+					selector = HTMLString
+					args[1] = appendTo|prependTo|before|after
+					args[2] = location (DOMElement)
+			*/
+			
 			element = Zelekt(selector,args[1],args[2]);	
 		}
 		
-//		We're passing in --
-//			element = array of 1 or more DOMElements
-//			selector = original selector text passed into _() (AdLib will use it as a property)
+		/*	
+			We're passing in --
+				element = array of 1 or more DOMElements
+				selector = original selector text passed into _() (AdLib will use it as a property)
+		*/
+		
 		return new AdLib(element,selector);
 	}
 
@@ -405,7 +414,6 @@ joshua.a.beam@gmail.com
 			}
 						
 			item.selector = item.selector || selector;
-			item.events = item.events || {};
 			item.states = item.states || {};
 			
 //			push each DOM element into the AdLib instance (which is an array-like object)
@@ -421,13 +429,11 @@ joshua.a.beam@gmail.com
 
 */
 	_.fn = AdLib.prototype = {
-//		An array-like object (Object[ ]) is much quicker than a plain object ({ })
-//		Therefore, it's given several properties of an array
+		
+//		Turn the AdLib object into an array-like object
 		length: 0,
 		push: emptyArray.push,
 		splice: emptyArray.splice,
-		
-//		Here begins all the useable methods
 
 		/*
 		
@@ -483,7 +489,6 @@ joshua.a.beam@gmail.com
 				type,
 				prop;
 			
-//			Handle: _('div').get('color');
 			if(len === 1) {
 				prop = args[0];
 				
@@ -508,7 +513,6 @@ joshua.a.beam@gmail.com
 				***/				
 				return getStyle(el,prop) || el.getAttribute(prop);	
 				
-//			Handle: _('div').get('style','color');
 			} else if (len === 2) {
 				type = args[0];
 				prop = args[1];
@@ -527,15 +531,7 @@ joshua.a.beam@gmail.com
 				type,
 				prop,
 				val;
-//			Handle: _('div').set({
-//				style: {
-//					color: 'black'
-//				},
-//				
-//				attr: {
-//					title: 'foo'	
-//				}
-//			});
+
 			forEach(this, function(el) {
 				if(len===1) {
 					object = args[0];
@@ -558,8 +554,6 @@ joshua.a.beam@gmail.com
 						}
 
 					}
-
-	//			Handle: _('div').set('text','hello\nworld');
 				} else if (len===2) {
 					type = args[0];
 					prop = args[1];
@@ -578,7 +572,6 @@ joshua.a.beam@gmail.com
 							setStyle(el,type,prop) || el.setAttribute(type,prop);
 							break;
 					}
-	//			Handle: _('div').set('style','color','red');
 				} else if (len===3) {
 					type = args[0];
 					prop = args[1];
@@ -665,7 +658,6 @@ joshua.a.beam@gmail.com
 				
 				if( !defined(state) ) {
 					
-//					return whether or not the element even exists
 					return defined(el);
 					
 				} else {
@@ -696,22 +688,25 @@ joshua.a.beam@gmail.com
 				
 				forEach(this, function(el) {
 					
-					addEvent(el, eventType, handler);
+					handleEvent('add', el, eventType, handler);
 					
 				});
 				
 			} else if (len === 3) {
+				/***
+					BUG: Cannot remove event listeners by name with delegation
+				***/
 				delegatedElement = _(arguments[1]);
 				handler = arguments[2];
+				name = functionName(handler);
 				
 				forEach(this, function(el) {
 					
-					addEvent(el, eventType, function(e) {
+					handleEvent('add', el, eventType, function(e) {
 						event = e || win.event;
 						target = event.target || event.srcElement;
 						
 						forEach(delegatedElement,function(de,i) {
-//							if target and delegatedElement are a reference to the same object
 							if(target === de) {
 								return handler(event);
 							}
@@ -728,7 +723,7 @@ joshua.a.beam@gmail.com
 			
 			forEach(this, function(el) {
 				
-				removeEvent(el, eventType, handler);
+				handleEvent('remove', el, eventType, handler);
 				
 			});
 			
@@ -736,7 +731,6 @@ joshua.a.beam@gmail.com
 		},
 	}
 
-//	Give the user access to the initialization function in the window
 	win._ = _;
 	
-})(this,this.document);
+})(this,this.document,[]);
