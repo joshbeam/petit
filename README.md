@@ -2,7 +2,40 @@
 
 *Version 0.1.0*
 
-AdLibJS is a small 6kb JavaScript framework, built around the concept of using as few methods as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
+AdLibJS is a **small JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
+
+For example, to get an attribute of an element, one could theoretically implement a method like this:<br>
+`_('div').attr('data-foo')`<br>
+
+However, AdLibJS simply uses a `.get()` method, which **can return any number of things**, depending on the arguments passed to it:<br>
+```javascript
+var div = _('div'),
+	foo = div.get('data-foo'),
+	color = div.get('color');
+```
+
+This doesn't mean there's anything wrong with more specific methods, like `.attr()`.  One can **simply extend the library**, as such:<br>
+```javascript
+(function() {
+
+	_.fn.attr = function(attribute,value) {
+		if(attribute!==undefined) {
+			if(value===undefined) {
+				return this[0].getAttribute(attribute);
+			} else if(value!==undefined) {
+				this.each(function(el) {
+					el.setAttribute(attribute,value);
+				});
+
+				return this;
+			}
+		}	
+	}
+
+})();
+
+div.attr('class') // ==> 'foo'
+```
 
 **The most current stable source is in:** *src --> adlib --> adlib(.min).js*
 
@@ -112,29 +145,6 @@ div.on('click', 'input', function() { console.log(true) });
 div.off('click');
 ```
 
-**Extend the library:**
-```javascript
-(function() {
-
-	_.fn.attr = function(attribute,value) {
-		if(attribute!==undefined) {
-			if(value===undefined) {
-				return this[0].getAttribute(attribute);
-			} else if(value!==undefined) {
-				this.each(function(el) {
-					el.setAttribute(attribute,value);
-				});
-
-				return this;
-			}
-		}	
-	}
-
-})();
-
-div.attr('class') // ==> 'foo'
-```
-
 **States explained:**<br>
 The idea behind the `states` object is to be able to assign human-readable states to an object.  Say we have a panel, and we want to toggle the panel's visibility.  Instead of checking `if( panel.get('display') === none )`, we can first instead set the state of the panel based on whether it's open or closed:
 ```javascript
@@ -147,9 +157,9 @@ if( panel.is('open') ) {
 ```
 
 ## Issues
-- Need support for named event handlers (i.e. `div.on('click.firstEvent', ...)`) in order to be able to detach specific handlers
+- No support to detach anonymous event handlers from elements (however, one can remove named handlers since `.on()` and `.off()` uses `addEventListener` (or `attachEvent` for IE<9)
 - Would like to be able to link `states` and events together, potentially using the publish/subscribe pattern
-- Might want to add a .siblings() method to retrieve a DOM element's sibling
+- Might want to add a `.siblings()` method to retrieve a DOM element's sibling
 - Does not support any sort of animation methods
 - Selector engine is minimal and requires the use of `querySelectorAll` for CSS-style selectors
 - .get(cssproperty) does not normalize vendor prefixes or opacity

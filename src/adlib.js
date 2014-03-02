@@ -276,6 +276,22 @@ joshua.a.beam@gmail.com
 		
 		return emptyArray.slice.call(object,0);
 	}
+	
+	function addEvent(object, type, handler) {
+		if(doc.addEventListener) {
+			object.addEventListener(type, handler, false);
+		} else {
+			object.attachEvent('on'+type, handler);	
+		}
+	}
+	
+	function removeEvent(object, type, handler) {
+		if(doc.removeEventListener) {
+			object.removeEventListener(type, handler, false);	
+		} else {
+			object.detachEvent('on'+type, handler);	
+		}
+	}
 
 /*
 
@@ -667,7 +683,7 @@ joshua.a.beam@gmail.com
 			
 			return this;
 		},
-		on: function() {	
+		on: function() {
 			var len = arguments.length,
 				eventType = arguments[0],
 				delegatedElement,
@@ -679,30 +695,19 @@ joshua.a.beam@gmail.com
 				handler = arguments[1];
 				
 				forEach(this, function(el) {
-					el.events['on'+eventType] = el.events['on'+eventType]||[];
-					el.events['on'+eventType].push(handler);
-
-	//				Update actual event handler
-					for(type in el.events) {
-
-						el[type] = function(e) {
-							forEach(el.events['on'+eventType],function(fn,i,e) {
-								event = e || window.event;
-								
-								fn.call(el,event);
-							})
-						}
-
-					}
-				});					
+					
+					addEvent(el, eventType, handler);
+					
+				});
+				
 			} else if (len === 3) {
 				delegatedElement = _(arguments[1]);
 				handler = arguments[2];
-								
+				
 				forEach(this, function(el) {
-					el.events['on'+eventType] = el.events['on'+eventType]||[];
-					el.events['on'+eventType].push(function(e) {
-						event = e || window.event;
+					
+					addEvent(el, eventType, function(e) {
+						event = e || win.event;
 						target = event.target || event.srcElement;
 						
 						forEach(delegatedElement,function(de,i) {
@@ -710,35 +715,21 @@ joshua.a.beam@gmail.com
 							if(target === de) {
 								return handler(event);
 							}
-						});
+						});						
 					});
-
-	//				Update actual event handler
-					for(type in el.events) {
-
-						el[type] = function(e) {
-							forEach(el.events[type],function(fn,i,e) {
-								event = e || window.event;
-								fn.call(el,event);
-							})
-
-						}
-
-					}
-				});					
+					
+				});
+				
 			}
 			
 			return this;
-			
 		},
-		off: function(type) {
-	
-			forEach(this,function(item) {
-				item.events['on'+type] = '';
+		off: function(eventType, handler) {
+			
+			forEach(this, function(el) {
 				
-				for(key in item.events) {
-					item[key] = item.events[key];	
-				}						
+				removeEvent(el, eventType, handler);
+				
 			});
 			
 			return this;
