@@ -1,5 +1,7 @@
 # AdLibJS
 
+*Version 0.1.0*
+
 AdLibJS is a small 6kb JavaScript framework, built around the concept of using as few methods as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
 **The most current stable source is in:** *src --> adlib --> adlib(.min).js*
@@ -149,6 +151,7 @@ if( panel.is('open') ) {
 - Would like to be able to link `states` and events together, potentially using the publish/subscribe pattern
 - Might want to add a .siblings() method to retrieve a DOM element's sibling
 - Does not support any sort of animation methods
+
 <hr>
 
 License under <a href="http://opensource.org/licenses/MIT">The MIT License</a> - &copy; 2014, Joshua Beam

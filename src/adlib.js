@@ -1,6 +1,6 @@
 /*
 
-AdLibJS
+AdLibJS v0.1.0
 An argument-based JavaScript framework
 
 The MIT License - (c) 2014, Joshua Beam
