@@ -2,7 +2,7 @@
 
 AdLibJS is a small 6kb JavaScript framework, built around the concept of using as few methods as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
-**The most current stable source is in:** *js --> adlib --> adlib(.min).js*
+**The most current stable source is in:** *src --> adlib --> adlib(.min).js*
 
 ## How to Use
 *A brief intro*
