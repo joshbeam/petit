@@ -673,7 +673,6 @@ joshua.a.beam@gmail.com
 				delegatedElement,
 				event,
 				target,
-				node,
 				handler;
 			
 			if(len === 2) {
@@ -699,9 +698,7 @@ joshua.a.beam@gmail.com
 			} else if (len === 3) {
 				delegatedElement = _(arguments[1]);
 				handler = arguments[2];
-				
-				console.log(delegatedElement);
-				
+								
 				forEach(this, function(el) {
 					el.events['on'+eventType] = el.events['on'+eventType]||[];
 					el.events['on'+eventType].push(function(e) {
