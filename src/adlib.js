@@ -397,22 +397,6 @@ joshua.a.beam@gmail.com
 		});
 
 	};
-
-/*
-
-	Used to extend the AdLib prototype
-
-*/
-//	_.extend = function(name,method,overwrite) {
-////		If the property exists in AdLib and we haven't explicitly stated that we can overwrite it...
-//		if( defined(AdLib.prototype[name]) && overwrite===false ) {
-//			throw 'Method already exists in AdLib.prototype';	
-//		} else {
-//			AdLib.prototype[name]=method;	
-//		}
-//	}
-	
-//	_.forEach = forEach;
 	
 
 /*
@@ -521,25 +505,12 @@ joshua.a.beam@gmail.com
 			}
 		},
 		set: function(type,prop,val) {
-		/***
-			POSSIBLE BUG:
-		
-			_('**').set('color','red');
-			
-			Only sets the color to red for the first matched element in the set,
-			which was not the intention of the above code.
-			
-			May need to implement forEach in AdLib's methods, except for .get().
-		***/
-			
-//			var el = this[0],
 			var args = arguments,
 				len = args.length,
 				object,
 				type,
 				prop,
 				val;
-			
 //			Handle: _('div').set({
 //				style: {
 //					color: 'black'
@@ -779,10 +750,5 @@ joshua.a.beam@gmail.com
 
 //	Give the user access to the initialization function in the window
 	win._ = _;
-//	win.AdLib = AdLib;
 	
 })(this,this.document);
-
-//Pass in this (window) and document as arguments for minification purposes
-//Because minfiers will not minify: document.documentElement
-//But they will minify: doc.documentElement (where doc is a parameter, which is mapped to document)
