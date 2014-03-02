@@ -151,7 +151,8 @@ if( panel.is('open') ) {
 - Would like to be able to link `states` and events together, potentially using the publish/subscribe pattern
 - Might want to add a .siblings() method to retrieve a DOM element's sibling
 - Does not support any sort of animation methods
-
+- Selector engine is minimal and requires the use of `querySelectorAll` for CSS-style selectors
+- .get(cssproperty) does not normalize vendor prefixes or opacity
 <hr>
 
 License under <a href="http://opensource.org/licenses/MIT">The MIT License</a> - &copy; 2014, Joshua Beam
