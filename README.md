@@ -23,11 +23,10 @@ This doesn't mean there's anything wrong with more specific methods, like `.attr
 			if(value===undefined) {
 				return this[0].getAttribute(attribute);
 			} else if(value!==undefined) {
-				this.each(function(el) {
+				return this.each(function(el) 
+					el = el[0];
 					el.setAttribute(attribute,value);
 				});
-
-				return this;
 			}
 		}	
 	}
