@@ -116,7 +116,7 @@ joshua.a.beam@gmail.com
 	function hasClass(element,klass) {
 		var classList = element.className.split(' ');
 
-		return inArray(classList, klass);
+		return classList.indexOf(klass) > -1;
 	}
 	
 //	add a class to an element
@@ -165,7 +165,7 @@ joshua.a.beam@gmail.com
 					classList = el.className.split(' ');
 
 					forEach(classes,function(klass) {
-						if( inArray(classList,klass) ) {
+						if( classList.indexOf(klass) > -1 ) {
 							removeClass(el,klass);
 						} else {
 							addClass(el,klass);
@@ -190,6 +190,10 @@ joshua.a.beam@gmail.com
 	}
 	
 //	set a style for an element
+	/***
+	POSSIBLE BUG:
+		Does this even work?
+	***/
 	function setStyle(object,prop,val) {
 		var prop = camelize(prop);
 
@@ -219,7 +223,7 @@ joshua.a.beam@gmail.com
 			var textNode = doc.createTextNode(item),
 				lineBreak = doc.createElement('br');
 
-			if(i!==text.length-1) {
+			if(i !== text.length-1) {
 				object.appendChild(textNode.cloneNode());
 				object.appendChild(lineBreak.cloneNode());
 			} else {
@@ -228,17 +232,10 @@ joshua.a.beam@gmail.com
 		});
 	}
 
-//	set the innerHTML of an element
-	function setHTML(object,html) {
-		object.innerHTML = html;	
-	}
-
 //	get the number of child elements of an element
 	function countChildElements(object) {
 
-		// why not: return object.getElementsByTagName('*').length ?
-
-		return object.hasChildNodes ? object.getElementsByTagName('*').length : 0;
+		return object.getElementsByTagName('*').length;
 
 	}
 	
@@ -249,7 +246,7 @@ joshua.a.beam@gmail.com
 				num = 0;
 
 			forEach(children,function(item) {
-				if( isTextNode(item) ) num+=1;
+				if( item.nodeType===3 ) num+=1;
 			});
 
 			return num;
@@ -257,20 +254,10 @@ joshua.a.beam@gmail.com
 
 		return 0;
 	}
-
-//	Bitwise NOT (~) turns -1 (not present in array) to 0
-//	Double logical NOT (!!) turns 0 into false
-//	Therefore, if the object is not present in the array, this function will return false
-	function inArray(array,object) {
-		/* experimental */
-		return !!(~array.indexOf(object));
-	}
 	
 //	push a single element into an array if it is not an array, or
 //	turn an array-like object into an array
 	function makeArray(object) {
-		/* experimental */
-//		if( !isLikeArray(object) ) return [object];
 		
 		return emptyArray.slice.call(object,0);
 	}
@@ -285,20 +272,13 @@ joshua.a.beam@gmail.com
 			
 		} else {
 			
-			var how = how === 'add' ? 'attach' : 'detach';
+			how = how === 'add' ? 'attach' : 'detach';
 			
 			object[how+'Event']('on'+type, handler);
 			
 		}
 		
 	}
-	
-//	function functionName(fun) {
-//	  var ret = fun.toString();
-//	  ret = ret.substr('function '.length);
-//	  ret = ret.substr(0, ret.indexOf('('));
-//	  return ret;
-//	}
 
 /*
 
@@ -313,57 +293,6 @@ joshua.a.beam@gmail.com
 	function isPlainObject(object) {
 		return !(object != null && object == object.win) && Object.getPrototypeOf(object) == Object.prototype;
 	}
-
-	function isArray(object) {
-		return /*Array.isArray(object)||*/object instanceof Array;
-	}
-	
-	function isLikeArray(object) {
-		return isArray(object) || ( !(~object.length) && !isString(object) );
-	}
-
-	function isFunction(object) {
-		return /*object instanceof Function||*/typeof(object) === 'function';
-	}
-
-	function isNumber(object) {
-		return typeof object==='number';
-	}
-
-	function isBoolean(object) {
-		return typeof object==='boolean';
-	}
-
-	function isString(string) {
-		return /*string instanceof String||*/typeof string === 'string';
-	}
-	
-	function isHTMLElement(object) {
-		return object.nodeType===1;
-	}
-
-	function isTextNode(object) {
-		return object.nodeType===3;
-	}
-
-	function isAdLib(object) {
-		return object instanceof AdLib;	
-	}
-	
-//	Checks definition of a declared or undeclared object
-//	Does not throw a ReferenceError
-	function defined(object) {
-		/* experimental */
-		return typeof(object)!=='undefined';
-	}
-	
-//	Checks definition of declared object by typecasting to boolean
-//	An object exists if it was declared, and has a value other than ("",undefined,NaN,0,null,false)
-//	Throws ReferenceError if object was never declared
-	function exists(object) {
-		/* experimental */
-		return !!object;	
-	}
 	
 /*
 
@@ -372,14 +301,13 @@ joshua.a.beam@gmail.com
 */
 	
 	function _() {
-		var args = arguments,
-			len = args.length,
-			selector = args[0],
+		var len = arguments.length,
+			selector = arguments[0],
 			element;
 
 		if(len<3) {
 //			Even if args[1] (context) is undefined, we can still pass it in (it just won't be used)
-			element = Zelekt(selector,args[1]);
+			element = Zelekt(selector,arguments[1]);
 		} else if (len===3) {
 			
 			/*
@@ -389,7 +317,7 @@ joshua.a.beam@gmail.com
 					args[2] = location (DOMElement)
 			*/
 			
-			element = Zelekt(selector,args[1],args[2]);	
+			element = Zelekt(selector,arguments[1],arguments[2]);	
 		}
 		
 		/*	
@@ -476,7 +404,7 @@ joshua.a.beam@gmail.com
 				object,
 				callback;
 			
-			if( isNumber(arguments[0]) ) {
+			if( typeof(arguments[0]) === 'number' ) {
 				
 				index = arguments[0];
 				
@@ -484,7 +412,7 @@ joshua.a.beam@gmail.com
 				
 			}
 				
-			if( isFunction(arguments[0]) ) {
+			if( typeof(arguments[0]) === 'function' ) {
 				callback = arguments[0];
 				
 				forEach(this,function(el) {
@@ -493,7 +421,7 @@ joshua.a.beam@gmail.com
 
 				});		
 
-			} else if ( isAdLib(arguments[0]) ) {
+			} else if ( arguments[0] instanceof AdLib ) {
 				object = arguments[0];
 				
 				forEach(this,function(el) {
@@ -547,38 +475,37 @@ joshua.a.beam@gmail.com
 		
 		get: function() {
 			var el = this[0],
-				args = arguments,
-				len = args.length,
+				len = arguments.length,
 				type,
 				prop;
 			
 			if(len === 1) {
-				prop = args[0];
+				prop = arguments[0];
 				
 				var map = {
 					text: getText(el),
 					tag: el.tagName,
 					html: el.innerHTML,
 					value: el.value,
-					index: emptyArray.indexOf.call(makeArray(_(el.selector)),el),
+					index: makeArray(_(el.selector)).indexOf(el),
 					states: el.states
-					//class
-					//id
 				}[prop.toLowerCase()];
 								
-				if( defined(map) ) return map;
+				if( typeof(map) !== 'undefined' ) return map;
 				
 				/***
 					POSSIBLE BUG:
 
 					getStyle(el,prop) ==> could return a falsy value?
+					e.g. an empty string "" (absence of a value is a value)
 					Thus, resorting to el.getAttribute(prop), which might not be intended
-				***/				
+				***/
+
 				return getStyle(el,prop) || el.getAttribute(prop);	
 				
 			} else if (len === 2) {
-				type = args[0];
-				prop = args[1];
+				type = arguments[0];
+				prop = arguments[1];
 				
 				return {
 					attr: el.getAttribute(prop),
@@ -647,7 +574,7 @@ joshua.a.beam@gmail.com
 		*/
 		
 		set: function() {
-			var args = arguments,
+			var args = arguments, // need to declare this for scope in forEach
 				len = args.length,
 				object,
 				type,
@@ -667,7 +594,7 @@ joshua.a.beam@gmail.com
 
 								switch(t) {
 									case 'style':
-										setStyle( el, v, (isNumber(val) ? val+'px' : val) );
+										setStyle( el, v, (typeof(val) === 'number' ? val+'px' : val) );
 										break;
 									case 'attr': el.setAttribute(v,val);
 										break;	
@@ -685,7 +612,7 @@ joshua.a.beam@gmail.com
 							setText(el,val);
 							break;
 						case 'html':
-							setHTML(el,val);
+							el.innerHTML = val;
 							break;
 						case 'class':
 							setClass(el,val);
@@ -701,7 +628,7 @@ joshua.a.beam@gmail.com
 
 					switch(type) {
 						case 'state':
-							el.states[prop] = isBoolean(val) ? val : null;
+							el.states[prop] = typeof(val) === 'boolean' ? val : null;
 							break;
 						case 'style':
 							setStyle(el,prop,val);
@@ -749,9 +676,8 @@ joshua.a.beam@gmail.com
 		*/
 		
 		has: function() {
-			var el,
-				args = arguments,
-				len = args.length,
+			var el = this[0],
+				len = arguments.length,
 				type,
 				prop,
 				object,
@@ -759,17 +685,16 @@ joshua.a.beam@gmail.com
 				limit;
 			
 			if(len === 1) {
-				el = this[0];
-				prop = args[0];
+				prop = arguments[0];
 								
 				var map = {
 					children: countChildElements(el),
 					text: countTextNodes(el) > 0
 				}[prop];
 
-				if ( defined(map) ) return map;
+				if ( typeof(map) !== 'undefined' ) return map;
 				
-				if( isAdLib(prop) ) {	
+				if( prop instanceof AdLib ) {	
 					
 					if( countChildElements(el) > 0) {
 						object = prop;
@@ -791,10 +716,8 @@ joshua.a.beam@gmail.com
 				}
 
 			} else if (len===2) {
-				
-				el = this[0];
-				type = args[0];
-				prop = args[1];
+				type = arguments[0];
+				prop = arguments[1];
 
 				return {
 					attr: el.hasAttribute(prop),
@@ -828,9 +751,9 @@ joshua.a.beam@gmail.com
 			var el = this[0],
 				state = arguments[0];
 				
-				if( !defined(state) ) {
+				if( typeof(state) === 'undefined' ) {
 					
-					return defined(el);
+					return typeof(el) !== 'undefined';
 					
 				} else {
 					
@@ -867,9 +790,8 @@ joshua.a.beam@gmail.com
 		*/
 		
 		each: function(fn) {
-			var el = this;
-			
-			forEach(el,function(item,i) {
+
+			forEach(this,function(item,i) {
 				fn.call(item,_(item),i);
 			});
 			
@@ -917,7 +839,7 @@ joshua.a.beam@gmail.com
 			var len = arguments.length,
 				eventType = arguments[0],
 				delegatedElement,
-				event,
+				ev, // short for 'event', which is sometimes a keyword
 				target,
 				handler;
 			
@@ -936,17 +858,16 @@ joshua.a.beam@gmail.com
 				***/
 				delegatedElement = _(arguments[1]);
 				handler = arguments[2];
-				name = functionName(handler);
 				
 				forEach(this, function(el) {
 					
 					handleEvent('add', el, eventType, function(e) {
-						event = e || win.event;
-						target = event.target || event.srcElement;
+						ev = e || win.event;
+						target = ev.target || ev.srcElement;
 						
 						forEach(delegatedElement,function(de,i) {
 							if(target === de) {
-								return handler(event);
+								return handler(ev);
 							}
 						});						
 					});
