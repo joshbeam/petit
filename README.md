@@ -21,14 +21,18 @@ This doesn't mean there's anything wrong with more specific methods, like `.attr
 	_.fn.attr = function() {
 		var len = arguments.length,
 			attribute = arguments[0],
-			value = arguments[1];
+			value;
 
-		if( attribute !== undefined ) {
-			if( value === undefined ) return this[0].getAttribute(attribute);
-			if( value !== undefined ) {
+		if( len > 0 ) {
+			if( len === 1 ) {
+			
+				return this[0].getAttribute(attribute);
+				
+			} else if( len === 2 ) {
+				value = arguments[1];
+			
 				return this.each(function(el) {
-					el = el[0];
-					el.setAttribute(attribute,value);
+					el[0].setAttribute(attribute,value);
 				});
 			}
 		}
