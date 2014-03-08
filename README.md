@@ -18,17 +18,20 @@ This doesn't mean there's anything wrong with more specific methods, like `.attr
 ```javascript
 (function() {
 
-	_.fn.attr = function(attribute,value) {
-		if(attribute!==undefined) {
-			if(value===undefined) {
-				return this[0].getAttribute(attribute);
-			} else if(value!==undefined) {
-				return this.each(function(el) 
+	_.fn.attr = function() {
+		var len = arguments.length,
+			attribute = arguments[0],
+			value = arguments[1];
+
+		if( attribute !== undefined ) {
+			if( value === undefined ) return this[0].getAttribute(attribute);
+			if( value !== undefined ) {
+				return this.each(function(el) {
 					el = el[0];
 					el.setAttribute(attribute,value);
 				});
 			}
-		}	
+		}
 	}
 
 })();
@@ -36,7 +39,7 @@ This doesn't mean there's anything wrong with more specific methods, like `.attr
 div.attr('class') // ==> 'foo'
 ```
 
-**The most current stable source is in:** *src --> adlib --> adlib(.min).js*
+**The most current stable source is in:** *src --> adlib(.min).js*
 
 ## How to Use
 *A brief intro*
