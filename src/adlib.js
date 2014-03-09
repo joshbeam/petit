@@ -10,8 +10,6 @@ joshua.a.beam@gmail.com
 */
 
 //TODO: need .siblings()
-//TODO: need .children()
-// (basically need options for DOM traversal without depending on querySelectorAll)
 //TODO: throw TypeErrors?
 //TODO: add animation methods? or as add-ons?
 //TODO: add event delegation to event methods
@@ -441,6 +439,31 @@ joshua.a.beam@gmail.com
 		length: 0,
 		push: emptyArray.push,
 		splice: emptyArray.splice,
+		
+		children: function(testObject) {
+			var thisChildren = [],
+				result = [],
+				testObject = _(testObject),
+				childNode;
+			
+			forEach(this, function(el) {
+				childNode = makeArray(el.getElementsByTagName('*'));
+				
+				forEach(childNode, function(node) {
+					if( isHTMLElement(node) && node.tagName !== 'SCRIPT' ) thisChildren.push(node);
+				});
+			});
+			
+			forEach(testObject, function(adlib) {
+				
+				forEach(thisChildren, function(child) {
+					if(adlib === child) result.push(adlib);
+				});
+				
+			});
+			
+			return _(result);
+		},
 
 		/*
 			.filter(index)
