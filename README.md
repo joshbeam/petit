@@ -54,6 +54,12 @@ By class: `_('.bar')`<br>
 By name: `_('@baz')`<br>
 By tag: `_('div')`<br>
 With `querySelectorAll`: `_('*.center > div#foo')`<br>
+Children:
+```javascript
+var div = _('div');
+
+div.children('input').set('class','add:prettified');
+```
 Filter:
 ```javascript
 var div = _('div');
