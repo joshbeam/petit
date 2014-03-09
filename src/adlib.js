@@ -10,6 +10,8 @@ joshua.a.beam@gmail.com
 */
 
 //TODO: need .siblings()
+//TODO: need .children()
+// (basically need options for DOM traversal without depending on querySelectorAll)
 //TODO: throw TypeErrors?
 //TODO: add animation methods? or as add-ons?
 //TODO: add event delegation to event methods
