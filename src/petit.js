@@ -1,6 +1,6 @@
 /*
 
-AdLibJS
+petit
 An argument-based JavaScript framework
 
 The MIT License - (c) 2014, Joshua Beam
@@ -69,7 +69,7 @@ joshua.a.beam@gmail.com
 
 /*
 
-	Various 'helper' functions that are used throughout AdLib.prototype
+	Various 'helper' functions that are used throughout Petit.prototype
 	
 */
 	
@@ -138,7 +138,7 @@ joshua.a.beam@gmail.com
 		
 	}
 
-//	used in AdLib.prototype.set()
+//	used in Petit.prototype.set()
 	function setClass(el,newClass) {
 		var method = /(add|remove|toggle):([\w\d-_]+)/,
 			classes,
@@ -293,6 +293,21 @@ joshua.a.beam@gmail.com
 		
 	}
 	
+	function children(object) {
+		var childNode,
+			children = [];
+		
+		forEach(object, function(el) {
+			childNode = makeArray(el.getElementsByTagName('*'));
+
+			forEach(childNode, function(node) {
+				if( isHTMLElement(node) && node.tagName !== 'SCRIPT' ) children.push(node);
+			});
+		});
+		
+		return children;
+	}
+	
 //	function functionName(fun) {
 //	  var ret = fun.toString();
 //	  ret = ret.substr('function '.length);
@@ -346,8 +361,8 @@ joshua.a.beam@gmail.com
 		return object.nodeType===3;
 	}
 
-	function isAdLib(object) {
-		return object instanceof AdLib;	
+	function isPetit(object) {
+		return object instanceof Petit;	
 	}
 	
 //	Checks definition of a declared or undeclared object
@@ -367,7 +382,7 @@ joshua.a.beam@gmail.com
 	
 /*
 
-	The selector/initialization function, which gets the element and returns an AdLib instance
+	The selector/initialization function, which gets the element and returns an Petit instance
 	
 */
 	
@@ -395,19 +410,19 @@ joshua.a.beam@gmail.com
 		/*	
 			We're passing in --
 				element = array of 1 or more DOMElements
-				selector = original selector text passed into _() (AdLib will use it as a property)
+				selector = original selector text passed into _() (Petit will use it as a property)
 		*/
 		
-		return new AdLib(element,selector);
+		return new Petit(element,selector);
 	}
 
 /*
 	The following constructor takes the element that the initialization function passed into it,
 	and then assigns each DOM element some properties, like 'selector', 'events', and 'states'
-	which can all be used later by the different AdLib methods.
+	which can all be used later by the different Petit methods.
 */
 	
-	function AdLib(element,selector) {
+	function Petit(element,selector) {
 		var that = this,
 			classes;
 				
@@ -421,7 +436,7 @@ joshua.a.beam@gmail.com
 			item.selector = item.selector || selector;
 			item.states = item.states || {};
 			
-//			push each DOM element into the AdLib instance (which is an array-like object)
+//			push each DOM element into the Petit instance (which is an array-like object)
 			that.push(item);
 		});
 
@@ -433,44 +448,46 @@ joshua.a.beam@gmail.com
 	The prototype
 
 */
-	_.fn = AdLib.prototype = {
+	_.fn = Petit.prototype = {
 		
-//		Turn the AdLib object into an array-like object
+//		Turn the Petit object into an array-like object
 		length: 0,
 		push: emptyArray.push,
 		splice: emptyArray.splice,
 		
-		children: function(testObject) {
-			var thisChildren = [],
-				result = [],
-				testObject = _(testObject),
-				childNode;
+		children: function() {
+			var len = arguments.length, 
+				thisChildren,
+				result,
+				testObject;
 			
-			forEach(this, function(el) {
-				childNode = makeArray(el.getElementsByTagName('*'));
+			if(len === 0) {
+
+				return _( children(this) );
 				
-				forEach(childNode, function(node) {
-					if( isHTMLElement(node) && node.tagName !== 'SCRIPT' ) thisChildren.push(node);
+			} else if (len === 1) {
+				result = [];
+				testObject = _(arguments[0]);
+				thisChildren = children(this);
+
+				forEach(testObject, function(petit) {
+
+					forEach(thisChildren, function(child) {
+						if(petit === child) result.push(petit);
+					});
+
 				});
-			});
-			
-			forEach(testObject, function(adlib) {
-				
-				forEach(thisChildren, function(child) {
-					if(adlib === child) result.push(adlib);
-				});
-				
-			});
-			
-			return _(result);
+
+				return _(result);
+			}
 		},
 
 		/*
 			.filter(index)
-			.filter(AdLib instance)
+			.filter(Petit instance)
 			.filter(callback)
 			
-			Filters elements of an AdLib instance by returning a new AdLib instance.
+			Filters elements of an Petit instance by returning a new Petit instance.
 			
 			Only one argument can be passed in.
 			
@@ -478,20 +495,20 @@ joshua.a.beam@gmail.com
 				
 				e.g. _('div').filter(1)
 				
-				It will return a new AdLib object of the element with the index corresponding
+				It will return a new Petit object of the element with the index corresponding
 				to the argument, in relation the instance's original matched set.
 				
-			If the argument is an AdLib instance:
+			If the argument is an Petit instance:
 			
 				e.g. _('div').filter( _('.center') )
 				
-				It will return a new AdLib object of elements that match the passed in argument object.
+				It will return a new Petit object of elements that match the passed in argument object.
 				
 			If the argument is a function:
 				
 				e.g. _('div').filter( function(el) { return el.get('index') > 0 } )
 				
-				It will return a new AdLib object with elements that are equal to the
+				It will return a new Petit object with elements that are equal to the
 				return value of the passed in function.
 		*/
 		
@@ -518,7 +535,7 @@ joshua.a.beam@gmail.com
 
 				});		
 
-			} else if ( isAdLib(arguments[0]) ) {
+			} else if ( isPetit(arguments[0]) ) {
 				object = arguments[0];
 				
 				forEach(this,function(el) {
@@ -567,7 +584,7 @@ joshua.a.beam@gmail.com
 				'style' , style ==> gets the style of an element
 				'state' , state ==> gets the custom set state of an element
 				
-			The AdLib instance IS NOT returned for chaining, because a value is returned.
+			The Petit instance IS NOT returned for chaining, because a value is returned.
 		*/
 		
 		get: function() {
@@ -619,7 +636,7 @@ joshua.a.beam@gmail.com
 			.set(type, property, value)
 			
 			Sets something for every element in the matched set and returns the
-			original AdLib instance for method chaining.
+			original Petit instance for method chaining.
 			
 			Only 1, 2, or 3 arguments can be passed in.
 			
@@ -744,7 +761,7 @@ joshua.a.beam@gmail.com
 		
 		/*
 			.has(string)
-			.has(AdLib instance)
+			.has(Petit instance)
 			.has(type, property)
 			
 			Returns either a number or a boolean value for the first matched element in the set.
@@ -758,8 +775,8 @@ joshua.a.beam@gmail.com
 				'children' ==> returns the number of child elements
 				'text' ==> return true or false, depending on whether the element has textNode elements
 				
-				If the argument in an AdLib instance, it will return true or false, depending on
-				whether or not the AdLib instance calling the method contains the AdLib instance
+				If the argument in an Petit instance, it will return true or false, depending on
+				whether or not the Petit instance calling the method contains the Petit instance
 				that is passed in as the argument.
 				
 				If the argument contains < or >, it assumes the user wants to see if the caller
@@ -769,7 +786,7 @@ joshua.a.beam@gmail.com
 				If the argument is a text string, it will return true or false, depending on whether
 				the innerText contains the argument string.
 			
-			The AdLib instance IS NOT returned for chaining, because a value is returned.
+			The Petit instance IS NOT returned for chaining, because a value is returned.
 		
 		*/
 		
@@ -794,7 +811,7 @@ joshua.a.beam@gmail.com
 
 				if ( defined(map) ) return map;
 				
-				if( isAdLib(prop) ) {	
+				if( isPetit(prop) ) {	
 					
 					if( countChildElements(el) > 0) {
 						object = prop;
@@ -845,7 +862,7 @@ joshua.a.beam@gmail.com
 				- Returns true if the state was set to true.
 				- Returns false if the state was set to false, or if the state was never set.
 			
-			The AdLib instance IS NOT returned for chaining, because a value is returned.			
+			The Petit instance IS NOT returned for chaining, because a value is returned.			
 			
 		*/
 		
@@ -868,7 +885,7 @@ joshua.a.beam@gmail.com
 			.each(function)
 			
 			Iterates through each element in the matched set and calls a function in the context
-			of the currently iterated element.  The original AdLib instance is returned for method
+			of the currently iterated element.  The original Petit instance is returned for method
 			chaining.
 			
 			Only one argument can be passed in.
@@ -885,7 +902,7 @@ joshua.a.beam@gmail.com
 				
 				});
 				
-				The currently iterated element as an AdLib object is passed in as
+				The currently iterated element as an Petit object is passed in as
 				the first argument to the callback function that the user provides the method.
 				The index of the currently iterated element in relation to the caller's matched set 
 				is passed in as the second argument.
@@ -906,7 +923,7 @@ joshua.a.beam@gmail.com
 			.on(eventType, delegatedElement, handler)
 			
 			Attaches an event handler to every element in the matched set.
-			The original AdLib instance is returned for method chaining.
+			The original Petit instance is returned for method chaining.
 			
 			Only two or three arguments can be passed in.
 			
@@ -931,7 +948,7 @@ joshua.a.beam@gmail.com
 				This method attaches an event listener to a parent element, and
 				the corresponding handler only fires if the event target is
 				the second argument (which is a selector string that is internally
-				turned into an AdLib instance).
+				turned into an Petit instance).
 				
 				At this time, named handlers cannot be detached from elements using
 				.off() if they were attached using the argument pattern for event
@@ -987,7 +1004,7 @@ joshua.a.beam@gmail.com
 			.off(eventType, handler)
 			
 			Detaches an event handler from every element in the matched set.
-			The original AdLib instance is returned for method chaining.
+			The original Petit instance is returned for method chaining.
 			
 			Only two arguments can be passed in.
 			

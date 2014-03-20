@@ -1,13 +1,16 @@
-# AdLibJS
+# petit
+(**puh-tee**)
+
+*a little javascript framework*
 
 *Version 0.1.0*
 
-AdLibJS is a **small JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
+petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
 For example, to get an attribute of an element, one could theoretically implement a method like this:<br>
 `_('div').attr('data-foo')`<br>
 
-However, AdLibJS simply uses a `.get()` method, which **can return any number of things**, depending on the arguments passed to it:<br>
+However, petit simply uses a `.get()` method, which **can return any number of things**, depending on the arguments passed to it:<br>
 ```javascript
 var div = _('div'),
 	foo = div.get('data-foo'),
@@ -43,7 +46,7 @@ This doesn't mean there's anything wrong with more specific methods, like `.attr
 div.attr('class') // ==> 'foo'
 ```
 
-**The most current stable source is in:** *src --> adlib(.min).js*
+**The most current stable source is in:** *src --> petit(.min).js*
 
 ## How to Use
 *A brief intro*
