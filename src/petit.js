@@ -10,7 +10,6 @@ joshua.a.beam@gmail.com
 */
 
 //TODO: need .siblings()
-//TODO: throw TypeErrors?
 //TODO: add animation methods? or as add-ons?
 //TODO: add event delegation to event methods
 //TODO: look into using GRUNT for automation
