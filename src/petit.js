@@ -10,6 +10,7 @@ joshua.a.beam@gmail.com
 */
 
 //TODO: need .siblings()
+//TODO: throw TypeErrors?
 //TODO: add animation methods? or as add-ons?
 //TODO: add event delegation to event methods
 //TODO: look into using GRUNT for automation
@@ -268,10 +269,15 @@ joshua.a.beam@gmail.com
 //	push a single element into an array if it is not an array, or
 //	turn an array-like object into an array
 	function makeArray(object) {
-		/* experimental */
-//		if( !isLikeArray(object) ) return [object];
+//		Using this instead of [].slice because IE<9 does not support
+//		using [].slice for nodeList objects.
+		var result = [];
 		
-		return emptyArray.slice.call(object,0);
+		forEach(object,function(o) {
+			result.push(o);
+		});
+		
+		return result;
 	}
 	
 	function handleEvent(how, object, type, handler) {

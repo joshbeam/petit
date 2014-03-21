@@ -255,11 +255,17 @@ joshua.a.beam@gmail.com
 		return 0;
 	}
 	
-//	push a single element into an array if it is not an array, or
 //	turn an array-like object into an array
 	function makeArray(object) {
+//		Using this instead of [].slice because IE<9 does not support
+//		using [].slice for nodeList objects.
+		var result = [];
 		
-		return emptyArray.slice.call(object,0);
+		forEach(object,function(o) {
+			result.push(o);
+		});
+		
+		return result;
 	}
 	
 	function handleEvent(how, object, type, handler) {
