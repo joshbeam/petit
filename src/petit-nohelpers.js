@@ -3,6 +3,11 @@
 petit
 An argument-based JavaScript framework
 
+version 0.1.1
+New in this version:
+- Better IE8 compatibility for selector engine (used document.getElementsByClassName polyfill)
+- .children() method
+
 The MIT License - (c) 2014, Joshua Beam
 
 joshua.a.beam@gmail.com
@@ -57,12 +62,12 @@ joshua.a.beam@gmail.com
 	
 //	Selector engine
 //	https://github.com/joshbeam/Zelektor
-	var Zelekt = (function(){function e(e,t){t.parentElement.insertBefore(e,t)}function t(e,t){t.parentNode.insertBefore(e,t.nextSibling)}function n(e,t){t.appendChild(e)}function r(e,t){t.insertBefore(e,t.firstChild)}function i(e){var t=document.createElement("div"),n;t.innerHTML=e;n=t.firstChild;return n}function s(e){var t=[],n=0,r=e.length;for(;n<r;n++){t.push(e[n])}return t}return function(){var u=arguments,a=u.length,f=u[0],l,c,h,p,d,v;if(a<3){if(typeof f==="string"){c=u[1]?u[1][0]:document;l={"#":"getElementById",".":"getElementsByClassName","@":"getElementsByName","*":"querySelectorAll"}[f[0]]||"getElementsByTagName";f=l.indexOf("Tag")>-1?f:f.slice(1);v=c[l](f);v=v.nodeType===1?[v]:s(v)}else if(f.nodeType===1){v=[f]}else if(f instanceof Array){v=f}}else if(a===3){h=u[1];p=u[2][0];d=i(f);switch(h){case"appendTo":n(d,p);break;case"prependTo":r(d,p);break;case"before":e(d,p);break;case"after":t(d,p);break}v=[d]}return v}})(),
+	var Zelekt = (function(){function e(e,t){t.parentElement.insertBefore(e,t)}function t(e,t){t.parentNode.insertBefore(e,t.nextSibling)}function n(e,t){t.appendChild(e)}function r(e,t){t.insertBefore(e,t.firstChild)}function i(e){var t=document.createElement("div"),n;t.innerHTML=e;n=t.firstChild;return n}function s(e){var t=[],n=0,r=e.length;for(;n<r;n++){t.push(e[n])}return t}if(!("getElementsByClassName"in document)){document.getElementsByClassName=function(e){if("querySelectorAll"in this){return this.querySelectorAll(e)}else{var t=this.getElementsByTagName("*"),n=0,r=t.length,i=[];for(;n<r;n++){if(t[n].className.indexOf(e)>-1){i.push(t[n])}}return i}}}if(!("getElementsByClassName"in Element.prototype)){Element.prototype.getElementsByClassName=document.getElementsByClassName}return function(){var o=arguments,u=o.length,a=o[0],f,l,c,h,p,d;if(u<3){if(typeof a==="string"){l=o[1]?o[1][0]:document;f={"#":"getElementById",".":"getElementsByClassName","@":"getElementsByName","*":"querySelectorAll"}[a[0]]||"getElementsByTagName";a=f.indexOf("Tag")>-1?a:a.slice(1);d=l[f](a);d=d.nodeType===1?[d]:s(d)}else if(a.nodeType===1){d=[a]}else if(a instanceof Array){d=a}}else if(u===3){c=o[1];h=o[2][0];p=i(a);switch(c){case"appendTo":n(p,h);break;case"prependTo":r(p,h);break;case"before":e(p,h);break;case"after":t(p,h);break}d=[p]}return d}})(),
 	
 	styles = doc.documentElement.style,
 		
 	styleAliases = {
-		'float': 'cssFloat' in styles ? 'cssFloat' : 'styleFloat',
+		'float': 'cssFloat' in styles ? 'cssFloat' : 'styleFloat'
 //		opacity ?
 	};
 	
@@ -285,6 +290,23 @@ joshua.a.beam@gmail.com
 		}
 		
 	}
+	
+//	Retrieves all children
+	
+	function children(object) {
+		var childNode,
+			children = [];
+		
+		forEach(object, function(el) {
+			childNode = makeArray(el.getElementsByTagName('*'));
+
+			forEach(childNode, function(node) {
+				if( isHTMLElement(node) && node.tagName !== 'SCRIPT' ) children.push(node);
+			});
+		});
+		
+		return children;
+	}
 
 /*
 
@@ -374,29 +396,31 @@ joshua.a.beam@gmail.com
 		push: emptyArray.push,
 		splice: emptyArray.splice,
 		
-		children: function(testObject) {
-			var thisChildren = [],
-				result = [],
-				testObject = _(testObject),
-				childNode;
+		children: function() {
+			var len = arguments.length, 
+				thisChildren,
+				result,
+				testObject;
 			
-			forEach(this, function(el) {
-				childNode = makeArray(el.getElementsByTagName('*'));
+			if(len === 0) {
+
+				return _( children(this) );
 				
-				forEach(childNode, function(node) {
-					if( node.nodeType===1 && node.tagName !== 'SCRIPT' ) thisChildren.push(node);
+			} else if (len === 1) {
+				result = [];
+				testObject = _(arguments[0]);
+				thisChildren = children(this);
+
+				forEach(testObject, function(petit) {
+
+					forEach(thisChildren, function(child) {
+						if(petit === child) result.push(petit);
+					});
+
 				});
-			});
-			
-			forEach(testObject, function(petit) {
-				
-				forEach(thisChildren, function(child) {
-					if(petit === child) result.push(petit);
-				});
-				
-			});
-			
-			return _(result);
+
+				return _(result);
+			}
 		},
 
 		/*

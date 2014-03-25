@@ -3,7 +3,11 @@
 
 *a little javascript framework*
 
-*Version 0.1.0*
+*Version 0.1.1*
+
+#### New in this version
+- Better IE8 compatibility in selector engine (using document.getElementsByTagName polyfill)
+- .children() method, which retrieves all children, grand-children, etc.
 
 petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
