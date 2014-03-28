@@ -306,7 +306,7 @@ joshua.a.beam@gmail.com
 		
 		if(/*doc[how+'EventListener']*/ how+'EventListener' in doc) {
 			
-			doc[how+'EventListener'](type, handler, false);
+			object[how+'EventListener'](type, handler, false);
 			
 		} else if (how+'Event' in object) {
 			
