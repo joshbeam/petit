@@ -3,11 +3,11 @@
 
 *a little javascript framework*
 
-*Version 0.1.1*
+*Version 0.1.2*
 
 #### New in this version
-- Better IE8 compatibility in selector engine (using document.getElementsByTagName polyfill)
-- .children() method, which retrieves all children, grand-children, etc.
+- Better support for IE, including IE8 and below (however, only recommeded for production use in IE9+ and all other major browsers)
+- .get() method revised to prevent unwanted behavior
 
 petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
@@ -175,13 +175,28 @@ if( panel.is('open') ) {
 }
 ```
 
+## Browser Compatibility
+**Only recommended for production use in IE9 and up and all other current versions of widely-used browsers**
+
+- Tested and functional in latest versions of Chrome, FireFox, Opera, Safari, and Internet Explorer (desktop versions)
+- Tested and functional in latest version of FireFox and Opera (mobile versions)
+- Very buggy in IE8 and below
+
+## History
+#### 0.1.1
+*25 March 2014*
+
+- Better IE8 compatibility in selector engine (using document.getElementsByTagName polyfill)
+- .children() method, which retrieves all children, grand-children, etc.
+
 ## Issues
 - No support to detach anonymous event handlers from elements (however, one can remove named handlers since `.on()` and `.off()` uses `addEventListener` (or `attachEvent` for IE<9)
 - Would like to be able to link `states` and events together, potentially using the publish/subscribe pattern
-- Might want to add a `.siblings()` method to retrieve a DOM element's sibling
+- Might want to add a `.siblings()` method to retrieve a DOM element's siblings
 - Does not support any sort of animation methods
 - Selector engine is minimal and requires the use of `querySelectorAll` for CSS-style selectors
 - .get(cssproperty) does not normalize vendor prefixes or opacity
+
 <hr>
 
 License under <a href="http://opensource.org/licenses/MIT">The MIT License</a> - &copy; 2014, Joshua Beam

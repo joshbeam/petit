@@ -3,10 +3,10 @@
 petit
 An argument-based JavaScript framework
 
-version 0.1.1
+version 0.1.2
 New in this version:
-- Better IE8 compatibility for selector engine (used document.getElementsByClassName polyfill)
-- .children() method
+- Better support for IE, including IE8 and below (however, only recommeded for production use in IE9+ and all other major browsers)
+- .get() method revised to prevent unwanted behavior
 
 The MIT License - (c) 2014, Joshua Beam
 
@@ -52,6 +52,16 @@ joshua.a.beam@gmail.com
 
 			return -1;
 		};
+	}
+	
+// Shim for hasAttribute (untested)
+	
+	if (!('hasAttribute' in Element.prototype)) {
+		// No Element.prototype in IE<8, so theoretically setting this method
+		// on Element would work
+		Element.hasAttribute = function(attr) {
+			return this[attr] !== null;
+		}
 	}
 
 //	Selector engine
@@ -184,7 +194,13 @@ joshua.a.beam@gmail.com
 		var prop = camelize(prop);
 
 //		returns the property, or 'undefined'
-		return (win.getComputedStyle(object)||object.currentStyle)[styleAliases[prop]||prop]
+		if('getComputedStyle' in win) {
+			return win.getComputedStyle(object)[styleAliases[prop]||prop];	
+		} else if ('currentStyle' in object) {
+			return object.currentStyle[styleAliases[prop]||prop];	
+		}
+		
+//		return (win.getComputedStyle(object)||object.currentStyle)[styleAliases[prop]||prop]
 	}
 	
 //	set a style for an element
@@ -202,7 +218,12 @@ joshua.a.beam@gmail.com
 	
 //	get the text of an element
 	function getText(object) {
-		return object['textContent'||'innerText'];
+		if('textContent' in object) {
+			return object.textContent;
+		} else if ('innerText' in object) {
+			return object.innerText;	
+		}
+//		return object['textContent'||'innerText'];
 	}
 
 //	set the text of an element
@@ -211,6 +232,9 @@ joshua.a.beam@gmail.com
 //			_('element').set('text'),'hello\n\nworld') => HTML: 'hello<br><br>world'
 		var text = text.split('\n');
 
+		/***
+			POSSIBLY BUGGY
+		***/
 		object['textContent'||'innerText']='';
 
 		forEach(text,function(item, i) {				
@@ -233,8 +257,6 @@ joshua.a.beam@gmail.com
 
 //	get the number of child elements of an element
 	function countChildElements(object) {
-
-		// why not: return object.getElementsByTagName('*').length ?
 
 		return object.hasChildNodes ? object.getElementsByTagName('*').length : 0;
 
@@ -282,11 +304,11 @@ joshua.a.beam@gmail.com
 
 		// doc[how+'EventListener']||doc[how = how === 'add' ? 'attach' : 'detach' + 'Event']
 		
-		if(doc[how+'EventListener']) {
+		if(/*doc[how+'EventListener']*/ how+'EventListener' in doc) {
 			
-			object[how+'EventListener'](type, handler, false);
+			doc[how+'EventListener'](type, handler, false);
 			
-		} else {
+		} else if (how+'Event' in object) {
 			
 			var how = how === 'add' ? 'attach' : 'detach';
 			
@@ -310,13 +332,6 @@ joshua.a.beam@gmail.com
 		
 		return children;
 	}
-	
-//	function functionName(fun) {
-//	  var ret = fun.toString();
-//	  ret = ret.substr('function '.length);
-//	  ret = ret.substr(0, ret.indexOf('('));
-//	  return ret;
-//	}
 
 /*
 
@@ -606,8 +621,8 @@ joshua.a.beam@gmail.com
 					html: el.innerHTML,
 					value: el.value,
 					index: emptyArray.indexOf.call(makeArray(_(el.selector)),el),
-					states: el.states
-					//class
+					states: el.states,
+					'class': el.className
 					//id
 				}[prop.toLowerCase()];
 								
@@ -618,24 +633,46 @@ joshua.a.beam@gmail.com
 
 					getStyle(el,prop) ==> could return a falsy value?
 					Thus, resorting to el.getAttribute(prop), which might not be intended
-				***/				
-				return getStyle(el,prop) || el.getAttribute(prop);	
+				***/
+				if( prop in styles || prop in styleAliases ) {
+					return getStyle(el,prop);	
+				} else if (el.hasAttribute(prop)) {
+					return el.getAttribute(prop);	
+				}
+				
+//				return getStyle(el,prop) || el.getAttribute(prop);	
 				
 			} else if (len === 2) {
 				type = args[0];
 				prop = args[1];
 				
-				return {
-					/***
-						BUG:
-						
-						getAttribute('class') won't work in IE < 8
-						IE interprets it as element['class'], which isn't a property of Element
-					***/
-					attr: el.getAttribute(prop),
-					style: getStyle(el,prop),
-					state: el.states[prop]
-				}[type];				
+				switch(type) {
+					case 'attr':
+						if(prop === 'class') {
+							return el.className;	
+						} else {
+							return el.getAttribute(prop);	
+						}
+						break;
+					case 'style':
+						return getStyle(el,prop);
+						break;
+					case 'state':
+						return el.states[prop];
+						break;
+				}
+//				
+//				return {
+//					/***
+//						BUG:
+//						
+//						getAttribute('class') won't work in IE < 8
+//						IE interprets it as element['class'], which isn't a property of Element
+//					***/
+//					attr: el.getAttribute(prop),
+//					style: getStyle(el,prop),
+//					state: el.states[prop]
+//				}[type];				
 			}
 		},
 		
@@ -848,6 +885,7 @@ joshua.a.beam@gmail.com
 				prop = args[1];
 
 				return {
+					// possible breakpoint in IE<8 if no hasAttribute shim
 					attr: el.hasAttribute(prop),
 					html: el.innerHTML.indexOf(prop) > -1,
 					text: getText(el).indexOf(prop) > -1,
