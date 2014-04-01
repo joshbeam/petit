@@ -3,13 +3,13 @@
 
 *a little javascript framework*
 
-*Version 0.1.2*
+*Version 0.1.3*
 
-#### New in this version
-- Better support for IE, including IE8 and below (however, only recommeded for production use in IE9+ and all other major browsers)
-- .get() method revised to prevent unwanted behavior
+#### New in this patch
+- Selector engine updated for correct IE8 'getElementsByClassName' polyfill (previous version was non-functional)
+- .has() method updated - now correctly returns a numerical value when a Petit object is passed in as the sole argument
 
-petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
+Petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
 
 For example, to get an attribute of an element, one could theoretically implement a method like this:<br>
 `_('div').attr('data-foo')`<br>
@@ -183,6 +183,12 @@ if( panel.is('open') ) {
 - Very buggy in IE8 and below
 
 ## History
+#### 0.1.2
+*29 March 2014*
+
+- Better support for IE, including IE8 and below (however, only recommeded for production use in IE9+ and all other major browsers)
+- .get() method revised to prevent unwanted behavior
+
 #### 0.1.1
 *25 March 2014*
 

@@ -3,10 +3,10 @@
 petit
 An argument-based JavaScript framework
 
-version 0.1.2
+version 0.1.3
 New in this version:
-- Better support for IE, including IE8 and below (however, only recommeded for production use in IE9+ and all other major browsers)
-- .get() method revised to prevent unwanted behavior
+- Selector engine updated for correct IE8 'getElementsByClassName' polyfill (previous version was non-functional)
+- .has() method updated - now correctly returns a numerical value when a Petit object is passed in as the sole argument
 
 The MIT License - (c) 2014, Joshua Beam
 
@@ -66,7 +66,7 @@ joshua.a.beam@gmail.com
 
 //	Selector engine
 //	https://github.com/joshbeam/Zelektor
-	var Zelekt = (function(){function e(e,t){t.parentElement.insertBefore(e,t)}function t(e,t){t.parentNode.insertBefore(e,t.nextSibling)}function n(e,t){t.appendChild(e)}function r(e,t){t.insertBefore(e,t.firstChild)}function i(e){var t=document.createElement("div"),n;t.innerHTML=e;n=t.firstChild;return n}function s(e){var t=[],n=0,r=e.length;for(;n<r;n++){t.push(e[n])}return t}if(!("getElementsByClassName"in document)){document.getElementsByClassName=function(e){if("querySelectorAll"in this){return this.querySelectorAll(e)}else{var t=this.getElementsByTagName("*"),n=0,r=t.length,i=[];for(;n<r;n++){if(t[n].className.indexOf(e)>-1){i.push(t[n])}}return i}}}if(!("getElementsByClassName"in Element.prototype)){Element.prototype.getElementsByClassName=document.getElementsByClassName}return function(){var o=arguments,u=o.length,a=o[0],f,l,c,h,p,d;if(u<3){if(typeof a==="string"){l=o[1]?o[1][0]:document;f={"#":"getElementById",".":"getElementsByClassName","@":"getElementsByName","*":"querySelectorAll"}[a[0]]||"getElementsByTagName";a=f.indexOf("Tag")>-1?a:a.slice(1);d=l[f](a);d=d.nodeType===1?[d]:s(d)}else if(a.nodeType===1){d=[a]}else if(a instanceof Array){d=a}}else if(u===3){c=o[1];h=o[2][0];p=i(a);switch(c){case"appendTo":n(p,h);break;case"prependTo":r(p,h);break;case"before":e(p,h);break;case"after":t(p,h);break}d=[p]}return d}})(),
+	var Zelekt = (function(){function e(e,t){t.parentElement.insertBefore(e,t)}function t(e,t){t.parentNode.insertBefore(e,t.nextSibling)}function n(e,t){t.appendChild(e)}function r(e,t){t.insertBefore(e,t.firstChild)}function i(e){var t=document.createElement("div"),n;t.innerHTML=e;n=t.firstChild;return n}function s(e){var t=[],n=0,r=e.length;for(;n<r;n++){t.push(e[n])}return t}if(!("getElementsByClassName"in document)){document.getElementsByClassName=function(e){if("querySelectorAll"in this){return this.querySelectorAll("."+e)}}}if(!("getElementsByClassName"in Element.prototype)){Element.prototype.getElementsByClassName=document.getElementsByClassName}return function(){var o=arguments,u=o.length,a=o[0],f,l,c,h,p,d;if(u<3){if(typeof a==="string"){l=o[1]?o[1][0]:document;f={"#":"getElementById",".":"getElementsByClassName","@":"getElementsByName","*":"querySelectorAll"}[a[0]]||"getElementsByTagName";a=f.indexOf("Tag")>-1?a:a.slice(1);d=l[f](a);d=d.nodeType===1?[d]:s(d)}else if(a.nodeType===1){d=[a]}else if(a instanceof Array){d=a}}else if(u===3){c=o[1];h=o[2][0];p=i(a);switch(c){case"appendTo":n(p,h);break;case"prependTo":r(p,h);break;case"before":e(p,h);break;case"after":t(p,h);break}d=[p]}return d}})(),
 	
 	styles = doc.documentElement.style,
 		
@@ -308,7 +308,7 @@ joshua.a.beam@gmail.com
 			
 			object[how+'EventListener'](type, handler, false);
 			
-		} else if (how+'Event' in object) {
+		} else if ('attachEvent' in object || 'detachEvent' in object) {
 			
 			var how = how === 'add' ? 'attach' : 'detach';
 			
@@ -844,7 +844,8 @@ joshua.a.beam@gmail.com
 				prop,
 				object,
 				callback,
-				limit;
+				limit,
+				has;
 			
 			if(len === 1) {
 				el = this[0];
@@ -863,12 +864,16 @@ joshua.a.beam@gmail.com
 						object = prop;
 
 						forEach(object,function(item) {
-							if(el.contains(item) && item !== el) return true;
+							if(el.contains(item) && item !== el) {
+								has = true;
+							} else {
+								has = false;	
+							}
 						});
 
 					}
 					
-					return false;
+					return has;
 						
 				} else {
 					
