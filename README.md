@@ -1,15 +1,11 @@
 # petit
-(**puh-tee**)
+*A little JavaScript framework* &mdash; *Version 0.1.3*
 
-*a little javascript framework*
-
-*Version 0.1.3*
-
-#### New in this patch
-- Selector engine updated for correct IE8 'getElementsByClassName' polyfill (previous version was non-functional)
-- .has() method updated - now correctly returns a numerical value when a Petit object is passed in as the sole argument
+<a href="http://www.petitjs.com">petitjs.com</a>
 
 Petit is a **little JavaScript framework**, built around the concept of using as **few methods** as possible to manipulate the DOM, while basing the implementation of those methods on their arguments.
+
+#### Petit only has 10 methods.
 
 For example, to get an attribute of an element, one could theoretically implement a method like this:<br>
 `_('div').attr('data-foo')`<br>
@@ -180,9 +176,16 @@ if( panel.is('open') ) {
 
 - Tested and functional in latest versions of Chrome, FireFox, Opera, Safari, and Internet Explorer (desktop versions)
 - Tested and functional in latest version of FireFox and Opera (mobile versions)
-- Very buggy in IE8 and below
+- Buggy in IE8 and below
 
 ## History
+
+#### 0.1.3 &mdash; Current stable version
+*31 March 2014*
+
+- Selector engine updated for correct IE8 'getElementsByClassName' polyfill (previous version was non-functional)
+- .has() method updated - now correctly returns a numerical value when a Petit object is passed in as the sole argument
+
 #### 0.1.2
 *29 March 2014*
 
@@ -198,10 +201,11 @@ if( panel.is('open') ) {
 ## Issues
 - No support to detach anonymous event handlers from elements (however, one can remove named handlers since `.on()` and `.off()` uses `addEventListener` (or `attachEvent` for IE<9)
 - Would like to be able to link `states` and events together, potentially using the publish/subscribe pattern
-- Might want to add a `.siblings()` method to retrieve a DOM element's siblings
+- Need more traversal methods (`.parent[s]()`, `.sibling[s]()`)
 - Does not support any sort of animation methods
 - Selector engine is minimal and requires the use of `querySelectorAll` for CSS-style selectors
 - .get(cssproperty) does not normalize vendor prefixes or opacity
+- Event delegation utilizing the `.on()` method does not work on dynamically created elements
 
 <hr>
 
